@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>スカイライン・テクノロジーズ ― ソフトウェアエンジニアリングスタジオ</title>
+<style>
+  :root {
+    --bg: #EEF0F4;
+    --bg-raised: #FFFFFF;
+    --ink: #141A2A;
+    --ink-soft: #3C4660;
+    --muted: #6B7390;
+    --accent: #B9742A;
+    --accent-soft: #E4A857;
+    --accent-ink: #2A1A06;
+    --line: rgba(20, 26, 42, 0.14);
+    --line-strong: rgba(20, 26, 42, 0.28);
+    --steel: #3E5873;
+    --steel-soft: #6E8BA8;
+    --shadow: 0 1px 2px rgba(20,26,42,0.06), 0 8px 24px rgba(20,26,42,0.06);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0B1220;
+      --bg-raised: #121B2E;
+      --ink: #EDEFF5;
+      --ink-soft: #C3C9DA;
+      --muted: #8B93A7;
+      --accent: #E8A33D;
+      --accent-soft: #F4C676;
+      --accent-ink: #241603;
+      --line: rgba(232, 163, 61, 0.16);
+      --line-strong: rgba(232, 163, 61, 0.3);
+      --steel: #5B7A9C;
+      --steel-soft: #8CA7C2;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 12px 32px rgba(0,0,0,0.35);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #0B1220;
+    --bg-raised: #121B2E;
+    --ink: #EDEFF5;
+    --ink-soft: #C3C9DA;
+    --muted: #8B93A7;
+    --accent: #E8A33D;
+    --accent-soft: #F4C676;
+    --accent-ink: #241603;
+    --line: rgba(232, 163, 61, 0.16);
+    --line-strong: rgba(232, 163, 61, 0.3);
+    --steel: #5B7A9C;
+    --steel-soft: #8CA7C2;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 12px 32px rgba(0,0,0,0.35);
+  }
+
+  :root[data-theme="light"] {
+    --bg: #EEF0F4;
+    --bg-raised: #FFFFFF;
+    --ink: #141A2A;
+    --ink-soft: #3C4660;
+    --muted: #6B7390;
+    --accent: #B9742A;
+    --accent-soft: #E4A857;
+    --accent-ink: #2A1A06;
+    --line: rgba(20, 26, 42, 0.14);
+    --line-strong: rgba(20, 26, 42, 0.28);
+    --steel: #3E5873;
+    --steel-soft: #6E8BA8;
+    --shadow: 0 1px 2px rgba(20,26,42,0.06), 0 8px 24px rgba(20,26,42,0.06);
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+  }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Yu Gothic", "Noto Sans JP", sans-serif;
+    line-height: 1.8;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  .mincho {
+    font-family: "Hiragino Mincho ProN", "YuMincho", "Yu Mincho", "Noto Serif JP", serif;
+  }
+
+  .mono {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, "Courier New", monospace;
+    font-variant-numeric: tabular-nums;
+  }
+
+  a { color: inherit; }
+
+  .wrap {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 0 clamp(20px, 5vw, 48px);
+  }
+
+  .bp-field {
+    position: relative;
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size: 64px 64px;
+  }
+
+  /* ---------- NAV ---------- */
+  header.nav {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: color-mix(in srgb, var(--bg) 86%, transparent);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+  .nav-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px clamp(20px, 5vw, 48px);
+  }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    font-size: 1.02rem;
+    text-decoration: none;
+  }
+  .logo svg { display: block; }
+  .logo .en {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    display: block;
+    margin-top: 1px;
+  }
+  nav.links {
+    display: flex;
+    gap: clamp(16px, 2.6vw, 32px);
+    font-size: 0.88rem;
+    color: var(--ink-soft);
+  }
+  nav.links a { text-decoration: none; position: relative; }
+  nav.links a:hover { color: var(--ink); }
+  nav.links a::after {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; bottom: -4px;
+    height: 1px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.25s ease;
+  }
+  nav.links a:hover::after { transform: scaleX(1); }
+  .nav-cta {
+    font-size: 0.82rem;
+    padding: 9px 16px;
+    border: 1px solid var(--line-strong);
+    border-radius: 2px;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  @media (max-width: 760px) {
+    nav.links { display: none; }
+  }
+
+  /* ---------- NOTICE BAR ---------- */
+  .notice-bar {
+    background: var(--bg-raised);
+    border-bottom: 1px solid var(--line);
+  }
+  .notice-bar-inner {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 10px clamp(20px, 5vw, 48px);
+  }
+  .notice-tag {
+    flex: none;
+    font-size: 0.66rem;
+    letter-spacing: 0.12em;
+    color: var(--accent-ink);
+    background: var(--accent);
+    padding: 3px 8px;
+    border-radius: 2px;
+  }
+  .notice-text {
+    margin: 0;
+    font-size: 0.86rem;
+    color: var(--ink-soft);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .notice-date {
+    color: var(--accent);
+    margin-right: 8px;
+  }
+  @media (max-width: 560px) {
+    .notice-bar-inner { align-items: flex-start; }
+    .notice-text { white-space: normal; }
+  }
+
+  /* ---------- HERO ---------- */
+  .hero {
+    position: relative;
+    padding-top: clamp(56px, 10vh, 108px);
+  }
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin: 0 0 22px;
+  }
+  .eyebrow::before {
+    content: "";
+    width: 22px;
+    height: 1px;
+    background: var(--accent);
+  }
+  h1.headline {
+    font-weight: 600;
+    font-size: clamp(2.2rem, 5.4vw, 3.9rem);
+    line-height: 1.42;
+    letter-spacing: 0.01em;
+    margin: 0 0 28px;
+    text-wrap: balance;
+    max-width: 16ch;
+  }
+  .hero-sub {
+    max-width: 46ch;
+    color: var(--ink-soft);
+    font-size: 1.02rem;
+    margin: 0 0 36px;
+  }
+  .hero-actions { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: clamp(40px, 7vh, 72px); }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 13px 22px;
+    font-size: 0.88rem;
+    text-decoration: none;
+    border-radius: 2px;
+    border: 1px solid transparent;
+    transition: transform 0.18s ease, opacity 0.18s ease;
+  }
+  .btn:hover { transform: translateY(-1px); }
+  .btn-primary { background: var(--accent); color: var(--accent-ink); font-weight: 600; }
+  .btn-ghost { border-color: var(--line-strong); color: var(--ink); }
+
+  .skyline-stage {
+    position: relative;
+    width: 100%;
+    height: clamp(220px, 32vw, 340px);
+    border-top: 1px solid var(--line-strong);
+  }
+  .skyline-stage::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 60%;
+    background: radial-gradient(60% 100% at 50% 0%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 70%);
+    pointer-events: none;
+  }
+  canvas#skyline { display: block; width: 100%; height: 100%; }
+
+  /* ---------- PHILOSOPHY / STATS ---------- */
+  .philosophy {
+    padding: clamp(56px, 9vh, 96px) 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .philosophy-line {
+    font-size: clamp(1.3rem, 2.6vw, 1.7rem);
+    max-width: 22ch;
+    margin: 0 0 48px;
+    text-wrap: balance;
+  }
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+  }
+  .stat {
+    background: var(--bg);
+    padding: 26px 20px;
+  }
+  .stat .num {
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+    font-weight: 600;
+    color: var(--accent);
+    display: block;
+  }
+  .stat .label {
+    font-size: 0.78rem;
+    color: var(--muted);
+    margin-top: 6px;
+  }
+  @media (max-width: 680px) {
+    .stats { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  /* ---------- SECTION / SHEET SYSTEM ---------- */
+  .sheet {
+    padding: clamp(64px, 10vh, 112px) 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .sheet-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+    margin-bottom: clamp(36px, 5vw, 56px);
+  }
+  .sheet-no {
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+  .sheet-no b { color: var(--accent); }
+  h2.sheet-title {
+    font-weight: 600;
+    font-size: clamp(1.7rem, 3.2vw, 2.3rem);
+    margin: 10px 0 0;
+  }
+  .sheet-note {
+    max-width: 38ch;
+    color: var(--muted);
+    font-size: 0.92rem;
+    text-align: right;
+  }
+  @media (max-width: 680px) {
+    .sheet-note { text-align: left; }
+  }
+
+  .panel {
+    position: relative;
+    background: var(--bg-raised);
+    border: 1px solid var(--line);
+    padding: 30px 26px;
+    box-shadow: var(--shadow);
+  }
+  .panel::before, .panel::after,
+  .tick-tl, .tick-br { position: absolute; width: 10px; height: 10px; pointer-events: none; }
+  .panel::before { content: ""; top: -1px; left: -1px; border-top: 1px solid var(--accent); border-left: 1px solid var(--accent); }
+  .panel::after { content: ""; bottom: -1px; right: -1px; border-bottom: 1px solid var(--accent); border-right: 1px solid var(--accent); }
+
+  /* Services */
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+  }
+  @media (max-width: 680px) { .services-grid { grid-template-columns: 1fr; } }
+  .service-idx {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 0.78rem;
+    color: var(--muted);
+    display: block;
+    margin-bottom: 14px;
+  }
+  .service-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0 0 10px;
+  }
+  .service-desc {
+    color: var(--ink-soft);
+    font-size: 0.92rem;
+    margin: 0;
+  }
+
+  /* Process */
+  .process-rail {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 22px;
+  }
+  .process-rail::before {
+    content: "";
+    position: absolute;
+    top: 11px;
+    left: 0; right: 0;
+    height: 1px;
+    background: var(--line-strong);
+  }
+  @media (max-width: 820px) {
+    .process-rail { grid-template-columns: 1fr; }
+    .process-rail::before { top: 0; bottom: 0; left: 11px; right: auto; width: 1px; height: auto; }
+  }
+  .process-step { position: relative; padding-top: 32px; }
+  @media (max-width: 820px) { .process-step { padding-top: 0; padding-left: 32px; } }
+  .process-dot {
+    position: absolute;
+    top: 0; left: 0;
+    width: 23px; height: 23px;
+    border-radius: 50%;
+    background: var(--bg);
+    border: 1px solid var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.68rem;
+    color: var(--accent);
+    font-family: ui-monospace, monospace;
+  }
+  .process-phase-jp {
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin: 0 0 2px;
+  }
+  .process-phase-en {
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin: 0 0 12px;
+  }
+  .process-desc { font-size: 0.88rem; color: var(--ink-soft); margin: 0; }
+
+  /* Work */
+  .work-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+  }
+  @media (max-width: 900px) { .work-grid { grid-template-columns: 1fr; } }
+  .work-tag {
+    display: inline-block;
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--steel-soft);
+    border: 1px solid var(--line-strong);
+    border-radius: 2px;
+    padding: 3px 8px;
+    margin-bottom: 16px;
+  }
+  .work-name { font-size: 1.08rem; font-weight: 600; margin: 0 0 4px; }
+  .work-client { font-size: 0.8rem; color: var(--muted); margin: 0 0 14px; }
+  .work-result { font-size: 0.9rem; color: var(--ink-soft); margin: 0; }
+
+  /* Culture */
+  .culture-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+  }
+  @media (max-width: 820px) { .culture-grid { grid-template-columns: 1fr; } }
+  .culture-item { padding: 24px 22px; border: 1px solid var(--line); background: var(--bg-raised); }
+  .culture-name { font-weight: 600; margin: 0 0 8px; font-size: 1rem; }
+  .culture-desc { font-size: 0.88rem; color: var(--ink-soft); margin: 0; }
+
+  /* Contact / Footer */
+  .contact {
+    padding: clamp(64px, 10vh, 112px) 0 0;
+  }
+  .contact-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 40px;
+    flex-wrap: wrap;
+    padding-bottom: clamp(48px, 8vh, 80px);
+  }
+  h2.contact-title {
+    font-size: clamp(1.8rem, 4vw, 2.6rem);
+    font-weight: 600;
+    max-width: 14ch;
+    margin: 0 0 20px;
+    text-wrap: balance;
+  }
+  .contact-sub { color: var(--ink-soft); max-width: 40ch; font-size: 0.95rem; margin: 0 0 28px; }
+  .contact-info {
+    display: grid;
+    gap: 10px;
+    font-size: 0.9rem;
+    min-width: 260px;
+  }
+  .contact-info dt { font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-top: 10px; }
+  .contact-info dd { margin: 2px 0 0; color: var(--ink-soft); }
+  .contact-info a { text-decoration: none; border-bottom: 1px solid var(--line-strong); }
+  .contact-info a:hover { border-color: var(--accent); color: var(--accent); }
+
+  footer.site-footer {
+    position: relative;
+    height: 140px;
+    border-top: 1px solid var(--line);
+  }
+  #footer-skyline { display: block; width: 100%; height: 100%; }
+  .foot-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px clamp(20px, 5vw, 48px);
+    font-size: 0.74rem;
+    color: var(--muted);
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  /* Scroll reveal */
+  .reveal { opacity: 0; transform: translateY(18px); transition: opacity 0.6s ease, transform 0.6s ease; }
+  .reveal.in { opacity: 1; transform: translateY(0); }
+  @media (prefers-reduced-motion: reduce) {
+    .reveal { opacity: 1; transform: none; transition: none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <a href="#top" class="logo">
+      <svg width="26" height="20" viewBox="0 0 26 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="1" y="9" width="4" height="10" fill="var(--steel)"/>
+        <rect x="6" y="4" width="4" height="15" fill="var(--steel-soft)"/>
+        <rect x="11" y="11" width="4" height="8" fill="var(--steel)"/>
+        <rect x="16" y="1" width="4" height="18" fill="var(--steel-soft)"/>
+        <rect x="21" y="7" width="4" height="12" fill="var(--steel)"/>
+        <circle cx="18" cy="5" r="1" fill="var(--accent)"/>
+      </svg>
+      <span>
+        スカイライン・テクノロジーズ
+        <span class="en">SKYLINE TECHNOLOGIES</span>
+      </span>
+    </a>
+    <nav class="links">
+      <a href="#services">サービス</a>
+      <a href="#process">プロセス</a>
+      <a href="#work">実績</a>
+      <a href="#culture">会社概要</a>
+    </nav>
+    <a href="#contact" class="nav-cta">お問い合わせ</a>
+  </div>
+</header>
+
+<div class="notice-bar">
+  <div class="notice-bar-inner wrap">
+    <span class="notice-tag mono">NOTICE</span>
+    <p class="notice-text"><span class="notice-date mono">2026.10.01</span>本社を東京都渋谷区「スカイラインビル」8Fへ移転いたしました。</p>
+  </div>
+</div>
+
+<main id="top">
+  <section class="hero">
+    <div class="wrap">
+      <p class="eyebrow">Software Engineering Studio — Tokyo, Japan</p>
+      <h1 class="headline mincho">事業の地平線に、<br>確かな構造を。</h1>
+      <p class="hero-sub">スカイライン・テクノロジーズは、都市の建築と同じ丹念さでソフトウェアを設計するエンジニアリングスタジオです。測量から運用まで、長く使い続けられる構造を共につくります。</p>
+      <div class="hero-actions">
+        <a href="#services" class="btn btn-primary">サービスを見る</a>
+        <a href="#contact" class="btn btn-ghost">お問い合わせ</a>
+      </div>
+    </div>
+    <div class="skyline-stage">
+      <canvas id="skyline"></canvas>
+    </div>
+  </section>
+
+  <section class="philosophy">
+    <div class="wrap">
+      <p class="philosophy-line mincho reveal">一棟の建物を設計するように、<br>一行のコードを積み上げる。</p>
+      <div class="stats reveal">
+        <div class="stat">
+          <span class="num mono">2016</span>
+          <span class="label">設立</span>
+        </div>
+        <div class="stat">
+          <span class="num mono">180+</span>
+          <span class="label">開発実績プロジェクト</span>
+        </div>
+        <div class="stat">
+          <span class="num mono">64名</span>
+          <span class="label">在籍エンジニア</span>
+        </div>
+        <div class="stat">
+          <span class="num mono">96%</span>
+          <span class="label">契約継続率</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sheet" id="services">
+    <div class="wrap">
+      <div class="sheet-head reveal">
+        <div>
+          <p class="sheet-no mono"><b>A-01</b> — SERVICES</p>
+          <h2 class="sheet-title">サービス</h2>
+        </div>
+        <p class="sheet-note">構想から実装、運用まで。事業のフェーズに応じて、必要な機能だけをご提供します。</p>
+      </div>
+      <div class="services-grid">
+        <div class="panel reveal">
+          <span class="service-idx mono">01 / CUSTOM DEVELOPMENT</span>
+          <h3 class="service-name">カスタムソフトウェア開発</h3>
+          <p class="service-desc">要件定義から実装まで、事業の成長速度に合わせて設計する基幹システム・業務アプリケーション開発。</p>
+        </div>
+        <div class="panel reveal">
+          <span class="service-idx mono">02 / CLOUD &amp; INFRASTRUCTURE</span>
+          <h3 class="service-name">クラウド・インフラ構築</h3>
+          <p class="service-desc">AWS / GCP を中心に、負荷変動に耐える堅牢なインフラとCI/CDパイプラインを構築。</p>
+        </div>
+        <div class="panel reveal">
+          <span class="service-idx mono">03 / PRODUCT DESIGN</span>
+          <h3 class="service-name">プロダクトデザイン（UI/UX）</h3>
+          <p class="service-desc">使う人の動線を測量するように調査し、迷いのないインターフェースに落とし込む。</p>
+        </div>
+        <div class="panel reveal">
+          <span class="service-idx mono">04 / DX CONSULTING</span>
+          <h3 class="service-name">DXコンサルティング</h3>
+          <p class="service-desc">既存業務の棚卸しから、段階的なシステム移行まで伴走する戦略設計。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sheet" id="process">
+    <div class="wrap">
+      <div class="sheet-head reveal">
+        <div>
+          <p class="sheet-no mono"><b>A-02</b> — PROCESS</p>
+          <h2 class="sheet-title">プロセス</h2>
+        </div>
+        <p class="sheet-note">建築の工程になぞらえた、4つのフェーズで進めます。</p>
+      </div>
+      <div class="process-rail reveal">
+        <div class="process-step">
+          <div class="process-dot">01</div>
+          <p class="process-phase-jp">測量</p>
+          <p class="process-phase-en mono">Discovery</p>
+          <p class="process-desc">事業の現状と課題を測量し、解くべき問題の輪郭を描く。</p>
+        </div>
+        <div class="process-step">
+          <div class="process-dot">02</div>
+          <p class="process-phase-jp">設計</p>
+          <p class="process-phase-en mono">Design</p>
+          <p class="process-desc">要件とアーキテクチャを設計図に落とし込み、関係者と合意形成する。</p>
+        </div>
+        <div class="process-step">
+          <div class="process-dot">03</div>
+          <p class="process-phase-jp">施工</p>
+          <p class="process-phase-en mono">Build</p>
+          <p class="process-desc">設計に基づき実装。短いサイクルで検証を重ねながら積み上げる。</p>
+        </div>
+        <div class="process-step">
+          <div class="process-dot">04</div>
+          <p class="process-phase-jp">運用</p>
+          <p class="process-phase-en mono">Operate</p>
+          <p class="process-desc">リリース後も保守・改善を継続し、構造の健全性を保ち続ける。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sheet" id="work">
+    <div class="wrap">
+      <div class="sheet-head reveal">
+        <div>
+          <p class="sheet-no mono"><b>A-03</b> — SELECTED WORK</p>
+          <h2 class="sheet-title">実績</h2>
+        </div>
+        <p class="sheet-note">架空の事例ですが、実際の開発で重視している観点を反映しています。</p>
+      </div>
+      <div class="work-grid">
+        <div class="panel reveal">
+          <span class="work-tag">物流 / Logistics</span>
+          <h3 class="work-name">ROUTE+</h3>
+          <p class="work-client">物流DXプラットフォーム</p>
+          <p class="work-result">全国200拠点の配送ルートをリアルタイム最適化し、配送コストを18%削減。</p>
+        </div>
+        <div class="panel reveal">
+          <span class="work-tag">フィンテック / Fintech</span>
+          <h3 class="work-name">Nolt Pay</h3>
+          <p class="work-client">中小企業向け後払い決済基盤</p>
+          <p class="work-result">決済APIを提供し、導入後3ヶ月で加盟店800社を突破。</p>
+        </div>
+        <div class="panel reveal">
+          <span class="work-tag">ヘルスケア / Healthcare</span>
+          <h3 class="work-name">Mellow Health</h3>
+          <p class="work-client">クリニック向け予約・問診システム</p>
+          <p class="work-result">予約導線を再設計し、ノーショー率を40%改善。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sheet" id="culture">
+    <div class="wrap">
+      <div class="sheet-head reveal">
+        <div>
+          <p class="sheet-no mono"><b>A-04</b> — CULTURE</p>
+          <h2 class="sheet-title">働く環境</h2>
+        </div>
+        <p class="sheet-note">構造を長持ちさせるのは、結局のところ人です。</p>
+      </div>
+      <div class="culture-grid reveal">
+        <div class="culture-item">
+          <p class="culture-name">裁量と責任</p>
+          <p class="culture-desc">技術選定から運用まで、チームが意思決定を持つ。</p>
+        </div>
+        <div class="culture-item">
+          <p class="culture-name">学び続ける文化</p>
+          <p class="culture-desc">技術書輪読会、社内LT会を毎月開催。</p>
+        </div>
+        <div class="culture-item">
+          <p class="culture-name">フルリモート可</p>
+          <p class="culture-desc">全国どこからでも、成果で信頼する働き方。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="contact" id="contact">
+    <div class="wrap">
+      <div class="contact-head reveal">
+        <div>
+          <p class="sheet-no mono"><b>A-05</b> — CONTACT</p>
+          <h2 class="contact-title mincho">次の構造を、<br>一緒に設計しませんか。</h2>
+          <p class="contact-sub">新規のご相談、お見積りのご依頼など、お気軽にお問い合わせください。1営業日以内にご返信いたします。</p>
+          <a href="mailto:hello@skyline-technologies.example.jp" class="btn btn-primary">hello@skyline-technologies.example.jp</a>
+        </div>
+        <dl class="contact-info">
+          <dt>Tel</dt>
+          <dd>03-0000-0000（平日 10:00–18:00）</dd>
+          <dt>Address</dt>
+          <dd>〒150-0002<br>東京都渋谷区渋谷<br>スカイラインビル 8F</dd>
+          <dt>Founded</dt>
+          <dd>2016年</dd>
+        </dl>
+      </div>
+    </div>
+    <footer class="site-footer">
+      <canvas id="footer-skyline"></canvas>
+    </footer>
+    <div class="foot-bar">
+      <span>© 2026 Skyline Technologies, Inc.</span>
+      <span class="mono">THIS IS A FICTIONAL COMPANY — DEMO SITE</span>
+    </div>
+  </section>
+</main>
+
+<script>
+(function () {
+  "use strict";
+  var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function cssVar(name) {
+    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  }
+
+  function makeSkyline(canvasId, opts) {
+    var canvas = document.getElementById(canvasId);
+    if (!canvas) return;
+    var ctx = canvas.getContext("2d");
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var buildings = [];
+    var seedBase = opts.seed || 1;
+
+    function seededRandom(seed) {
+      var s = seed;
+      return function () {
+        s = (s * 9301 + 49297) % 233280;
+        return s / 233280;
+      };
+    }
+
+    function layout() {
+      var rect = canvas.getBoundingClientRect();
+      canvas.width = Math.max(1, Math.floor(rect.width * dpr));
+      canvas.height = Math.max(1, Math.floor(rect.height * dpr));
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      var w = rect.width, h = rect.height;
+      var rnd = seededRandom(seedBase * 1000 + Math.floor(w));
+      buildings = [];
+      var x = 0;
+      var minW = opts.minW, maxW = opts.maxW;
+      while (x < w) {
+        var bw = minW + rnd() * (maxW - minW);
+        var bh = h * (opts.minHRatio + rnd() * (opts.maxHRatio - opts.minHRatio));
+        var layer = rnd() > 0.5 ? "near" : "far";
+        var cols = Math.max(1, Math.floor(bw / 9));
+        var rows = Math.max(1, Math.floor(bh / 12));
+        var windows = [];
+        for (var c = 0; c < cols; c++) {
+          for (var r = 0; r < rows; r++) {
+            if (rnd() > 0.55) {
+              windows.push({
+                c: c, r: r,
+                on: rnd() > 0.4,
+                phase: rnd() * Math.PI * 2,
+                speed: 0.4 + rnd() * 0.8
+              });
+            }
+          }
+        }
+        buildings.push({ x: x, w: bw, h: bh, layer: layer, cols: cols, rows: rows, windows: windows });
+        x += bw + opts.gap * rnd() + opts.gap * 0.4;
+      }
+    }
+
+    function draw(t) {
+      var rect = canvas.getBoundingClientRect();
+      var w = rect.width, h = rect.height;
+      ctx.clearRect(0, 0, w, h);
+
+      var steel = cssVar("--steel");
+      var steelSoft = cssVar("--steel-soft");
+      var accent = cssVar("--accent");
+
+      buildings.forEach(function (b) {
+        ctx.fillStyle = b.layer === "far" ? steelSoft : steel;
+        ctx.globalAlpha = b.layer === "far" ? 0.55 : 0.9;
+        var by = h - b.h;
+        ctx.fillRect(b.x, by, b.w, b.h);
+        ctx.globalAlpha = 1;
+
+        var wSize = 2.6;
+        var padX = b.w / (b.cols + 1);
+        var padY = 10;
+        b.windows.forEach(function (win) {
+          var wx = b.x + padX * (win.c + 1) - wSize / 2;
+          var wy = by + 10 + win.r * padY;
+          if (wy > h - 6) return;
+          var flicker = reduceMotion ? (win.on ? 1 : 0) : (0.5 + 0.5 * Math.sin(t * 0.001 * win.speed + win.phase));
+          var on = win.on ? flicker : flicker * 0.08;
+          ctx.fillStyle = accent;
+          ctx.globalAlpha = 0.15 + on * 0.75;
+          ctx.fillRect(wx, wy, wSize, wSize);
+          ctx.globalAlpha = 1;
+        });
+      });
+    }
+
+    function frame(t) {
+      draw(t);
+      if (!reduceMotion) requestAnimationFrame(frame);
+    }
+
+    layout();
+    if (reduceMotion) {
+      draw(0);
+    } else {
+      requestAnimationFrame(frame);
+    }
+
+    var resizeTimer;
+    window.addEventListener("resize", function () {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(function () {
+        layout();
+        if (reduceMotion) draw(0);
+      }, 120);
+    });
+  }
+
+  makeSkyline("skyline", { seed: 7, minW: 22, maxW: 58, gap: 14, minHRatio: 0.3, maxHRatio: 0.92 });
+  makeSkyline("footer-skyline", { seed: 42, minW: 16, maxW: 40, gap: 10, minHRatio: 0.25, maxHRatio: 0.85 });
+
+  if ("IntersectionObserver" in window && !reduceMotion) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("in");
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15 });
+    document.querySelectorAll(".reveal").forEach(function (el) { io.observe(el); });
+  } else {
+    document.querySelectorAll(".reveal").forEach(function (el) { el.classList.add("in"); });
+  }
+})();
+</script>
+</body>
+</html>
